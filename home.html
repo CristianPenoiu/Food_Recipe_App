@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Recipes App</title>
+  <link rel="stylesheet" href="styles/style.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Food Recipes App</h1>
+    <!-- Search input field and button -->
+    <div style="margin-bottom: 20px;">
+      <input type="text" v-model="searchQuery" placeholder="Enter recipe name">
+      <button @click="searchRecipesByName">Search by recipe name</button>
+      <button @click="searchRecipesByIngredients">Search by ingredients</button>
+    </div>
+    <div v-if="searchResults.length > 0"> <!-- Show the search results table if there are search results -->
+      <div style="float:left">
+        <h2 style="display: inline-block;">Search Results</h2>
+        <button style="display: inline-block; margin-left: 10px;"><a href="http://127.0.0.1:5500/home.html" style="text-decoration: none; color: black;">Go back</a></button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th v-if="showAllColumns">Author</th>
+            <th v-if="showAllColumns">Number of Ingredients</th>
+            <th v-if="showAllColumns">Skill Level</th>
+            <th>Action</th> <!-- Added column for the "Details" button -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(recipe, index) in slicedSearchResults" :key="index">
+            <td>{{ recipe.name }}</td>
+            <td v-if="showAllColumns">
+              <!-- Use v-if to conditionally render -->
+              <button v-if="recipe.author" @click="fetchRecipesByAuthor(recipe.author)" >{{ recipe.author }}</button>
+              <span v-else>-</span>
+            </td>
+            <td v-if="showAllColumns">{{ recipe.numberOfIngredients }}</td>
+            <td v-if="showAllColumns">{{ recipe.skillLevel }}</td>
+            <td><button @click="fetchRecipeDetails(recipe.name)">Details</button></td> <!-- Added button to show recipe details -->
+          </tr>
+        </tbody>
+      </table>
+      <div>
+        <button @click="goToPreviousSearchPage" :disabled="currentSearchPage === 1">Previous</button>
+        <span>Page {{ currentSearchPage }}</span>
+        <button @click="goToNextSearchPage" :disabled="currentSearchPage === totalSearchPages">Next</button>
+      </div>
+    </div>
+    <div v-else> <!-- Show the main recipes table if search results are not displayed -->
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Author</th>
+            <th>Number of Ingredients</th>
+            <th>Skill Level</th>
+            <th>Action</th> <!-- Added column for the "Details" button -->
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(recipe, index) in slicedRecipes" :key="index">
+            <td>{{ recipe.name }}</td>
+            <td>
+              <!-- Use v-if to conditionally render -->
+              <button v-if="recipe.author" @click="fetchRecipesByAuthor(recipe.author)">{{ recipe.author }}</button>
+              <span v-else>-</span>
+            </td>
+            <td>{{ recipe.numberOfIngredients }}</td>
+            <td>{{ recipe.skillLevel }}</td>
+            <td><button @click="fetchRecipeDetails(recipe.name)">Details</button></td> <!-- Added button to show recipe details -->
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top: 20px;">
+        <button @click="goToPreviousPage" :disabled="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }}</span>
+        <button @click="goToNextPage" :disabled="currentPage === totalPages">Next</button>
+      </div>
+    </div>
+    <!-- Details of the selected recipe -->
+    <div v-if="selectedRecipe">
+      <h2>Details for {{ selectedRecipe.name }}</h2>
+      <p>Description: {{ selectedRecipe.description }}</p>
+      <p>Cooking Time: {{ selectedRecipe.cookingTime }}</p>
+      <p>Preparation Time: {{ selectedRecipe.preparationTime }}</p>
+      <p>Ingredients: {{ selectedRecipe.ingredients.join(', ') }}</p>
+      <button @click="closeRecipeDetails">Close</button>
+    </div>
+    <div v-else>
+      <p>No recipe selected</p>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="./js/recipe_scripts.js"></script>
+</body>
+</html>
